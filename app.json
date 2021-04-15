@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "vuivailon",
-    "slug": "vuivailon",
+    "name": "NoAdsFPT",
+    "slug": "noadsfpt",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.nguyenvuzxc1.noadsfpt"
     },
     "web": {
       "favicon": "./assets/favicon.png"
