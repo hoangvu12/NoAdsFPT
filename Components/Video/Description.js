@@ -1,0 +1,132 @@
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet, LogBox } from "react-native";
+
+import tailwind from "tailwind-rn";
+import { vw, vh } from "react-native-expo-viewport-units";
+
+import Item from "../../Components/Anime/Item";
+
+LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
+
+export default function Description(props) {
+  const { data: anime } = props;
+
+  const [descriptionObj, setDescriptionObj] = useState(() => {
+    return [
+      {
+        key: "Số tập",
+        value: `${anime.episode_latest}/${anime.episode_total}`,
+      },
+      {
+        key: "Thời lượng",
+        value: anime.avrg_duration,
+      },
+      {
+        key: "Quốc gia",
+        value: anime.nation,
+      },
+      {
+        key: "Thể loại",
+        value: anime.list_structure_name.join(", "),
+      },
+      {
+        key: "Phát hành",
+        value: anime.movie_release_date,
+      },
+    ];
+  });
+
+  return (
+    <View style={{ ...tailwind("py-2 items-center"), width: vw(100), flex: 1 }}>
+      <ScrollView horizontal style={styles.container}>
+        <View style={styles.column}>
+          <ScrollView>
+            <View style={tailwind("flex items-center justify-center mb-5")}>
+              <Text
+                style={tailwind("text-white text-base font-bold")}
+                numberOfLines={1}
+              >
+                {anime.title_vie || anime.title}
+              </Text>
+              <Text style={tailwind("text-gray-500 text-sm")} numberOfLines={1}>
+                {anime.title_origin || anime.title}
+              </Text>
+            </View>
+            <View style={tailwind("mb-5")}>
+              {descriptionObj.map((description, index) => (
+                <View style={tailwind("flex-row justify-between")} key={index}>
+                  <Text style={tailwind("text-white font-bold text-sm")}>
+                    {description.key}
+                  </Text>
+                  <Text style={tailwind("text-gray-500 text-sm")}>
+                    {description.value}
+                  </Text>
+                </View>
+              ))}
+            </View>
+            <View>
+              <Text style={tailwind("text-white font-bold text-sm mb-1")}>
+                Tóm tắt
+              </Text>
+              <Text style={tailwind("text-white mb-3")}>
+                {anime.description}
+              </Text>
+            </View>
+          </ScrollView>
+        </View>
+        <View style={styles.column}>
+          <ScrollView>
+            <View style={tailwind("flex justify-center mb-5")}>
+              <Text
+                style={tailwind("text-white text-base font-bold")}
+                numberOfLines={1}
+              >
+                Tập phim
+              </Text>
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Item.Container style={{ width: "100%" }}>
+                <Item
+                  data={anime.episodes}
+                  horizontal={false}
+                  episode={props.episode}
+                  onPress={props.onEpisodePress}
+                />
+              </Item.Container>
+            </View>
+          </ScrollView>
+        </View>
+
+        <View style={styles.column}>
+          <ScrollView>
+            <View style={tailwind("flex justify-center mb-5")}>
+              <Text
+                style={tailwind("text-white text-base font-bold")}
+                numberOfLines={1}
+              >
+                Nội dung liên quan
+              </Text>
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Item.Container style={{ width: "100%" }}>
+                <Item data={anime.related_videos} horizontal={false} />
+              </Item.Container>
+            </View>
+          </ScrollView>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    width: "95%",
+  },
+  column: {
+    width: vw(90),
+    marginRight: 12,
+  },
+});
