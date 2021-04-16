@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, ScrollView, StyleSheet, LogBox } from "react-native";
-
 import tailwind from "tailwind-rn";
 import { vw, vh } from "react-native-expo-viewport-units";
 
 import Item from "../../Components/Anime/Item";
+import { VideoContext } from "./Store";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
 export default function Description(props) {
-  const { data: anime } = props;
+  const {
+    episode: [episode],
+    info: [anime],
+  } = useContext(VideoContext);
 
-  const [descriptionObj, setDescriptionObj] = useState(() => {
+  const [descriptionObj] = useState(() => {
     return [
       {
         key: "Số tập",
@@ -88,15 +91,43 @@ export default function Description(props) {
             <View style={{ flex: 1 }}>
               <Item.Container style={{ width: "100%" }}>
                 <Item
-                  data={anime.episodes}
+                  data={anime.episodes.filter((episode) => !episode.is_trailer)}
                   horizontal={false}
-                  episode={props.episode}
+                  episode={episode}
                   onPress={props.onEpisodePress}
                 />
               </Item.Container>
             </View>
           </ScrollView>
         </View>
+
+        {anime.episodes.some((episode) => episode.is_trailer) && (
+          <View style={styles.column}>
+            <ScrollView>
+              <View style={tailwind("flex justify-center mb-5")}>
+                <Text
+                  style={tailwind("text-white text-base font-bold")}
+                  numberOfLines={1}
+                >
+                  Trailer
+                </Text>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Item.Container style={{ width: "100%" }}>
+                  <Item
+                    data={anime.episodes.filter(
+                      (episode) => episode.is_trailer
+                    )}
+                    horizontal={false}
+                    episode={episode}
+                    onPress={props.onEpisodePress}
+                  />
+                </Item.Container>
+              </View>
+            </ScrollView>
+          </View>
+        )}
 
         <View style={styles.column}>
           <ScrollView>

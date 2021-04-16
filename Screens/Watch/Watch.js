@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { View, Text } from "react-native";
 
-import Video from "../../Components/Video/Video";
+import Video from "../../Components/Video";
 
 import { getAnimeInfo, getVideoSource } from "../../utils/api";
 import { isEmpty } from "../../utils/";
+import useOrientation from "../../hooks/useOrientation";
+
+import { VideoContext } from "../../Components/Video/Store";
 
 export default function Watch({ route, navigation }) {
-  const [info, setInfo] = useState({});
-  const [episode, setEpisode] = useState(0);
+  const { id } = route.params;
+
+  const {
+    episode: [episode, setEpisode],
+    maxEpisode: [maxEpisode, setMaxEpisode],
+    info: [info, setInfo],
+  } = useContext(VideoContext);
+
   const [videoUrl, setVideoUrl] = useState("");
 
-  const [loading, setLoading] = useState(false);
-
-  const { id } = route.params;
+  const orientation = useOrientation();
 
   const handleEpisodePress = (episode) => {
     setEpisode(episode);
@@ -21,13 +28,10 @@ export default function Watch({ route, navigation }) {
 
   useEffect(() => {
     const getData = async () => {
-      setLoading(true);
-
       const info = await getAnimeInfo({ id });
 
       setInfo(info);
-
-      setLoading(false);
+      setMaxEpisode(info.episode_latest);
     };
 
     getData();
@@ -35,12 +39,9 @@ export default function Watch({ route, navigation }) {
 
   useEffect(() => {
     const getData = async () => {
-      setLoading(true);
-
       const { url } = await getVideoSource({ id, episode });
 
       setVideoUrl(url);
-      setLoading(false);
     };
 
     getData();
@@ -52,11 +53,9 @@ export default function Watch({ route, navigation }) {
         <View style={{ flex: 1, backgroundColor: "#18191A" }}>
           <Video source={videoUrl} />
 
-          <Video.Description
-            data={info}
-            episode={episode}
-            onEpisodePress={handleEpisodePress}
-          />
+          {orientation !== "LANDSCAPE" && (
+            <Video.Description onEpisodePress={handleEpisodePress} />
+          )}
         </View>
       )}
     </>

@@ -9,6 +9,8 @@ import { getList } from "../../utils/api";
 import { isEmpty, notifyMessage } from "../../utils/";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
+import list from "../../data/list.json";
+
 export default function Item(props) {
   const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +18,17 @@ export default function Item(props) {
 
   const navigation = useNavigation();
 
+  if (props.data) {
+    useEffect(() => {
+      setAnimeList(props.data);
+    }, [props.data]);
+  }
+
   useEffect(() => {
+    setLoading(true);
     if (!props.data) {
       const getData = async () => {
-        setLoading(true);
         const list = await getList({ structure_id: props.structure_id });
-
         setAnimeList(list);
         setLoading(false);
       };

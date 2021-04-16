@@ -16,6 +16,8 @@ export default function Search() {
   const [results, setResults] = useState([]);
 
   useEffect(() => {
+    setResults([]);
+
     const getData = async () => {
       if (!keyword) return;
 
@@ -24,9 +26,7 @@ export default function Search() {
       setResults(searchResults);
     };
 
-    const delayDebounceFn = setTimeout(() => {
-      getData();
-    }, 1500);
+    const delayDebounceFn = setTimeout(getData, 1500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [keyword]);
@@ -55,11 +55,9 @@ export default function Search() {
           onPress={handleOnPress}
         />
       </View>
-      {!isEmpty(results) && (
-        <View>
-          <Search.List data={results} />
-        </View>
-      )}
+      <View>
+        <Search.List data={results} />
+      </View>
     </View>
   );
 }
