@@ -2,8 +2,9 @@ import React, { useState, useContext } from "react";
 import { View, Text, ScrollView, StyleSheet, LogBox } from "react-native";
 import tailwind from "tailwind-rn";
 import { vw, vh } from "react-native-expo-viewport-units";
+import { useNavigation } from "@react-navigation/native";
 
-import Item from "../../Components/Anime/Item";
+import Item from "../../Components/Item";
 import { VideoContext } from "./Store";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
@@ -13,6 +14,16 @@ export default function Description(props) {
     episode: [episode],
     info: [anime],
   } = useContext(VideoContext);
+
+  const navigation = useNavigation();
+
+  const handleTitleColor = ({ anime }) => {
+    return anime._id === episode ? "#ff6500" : "#fff";
+  };
+
+  const handleItemPress = (props) => {
+    navigation.push("Watch", { id: props.id });
+  };
 
   const [descriptionObj] = useState(() => {
     return [
@@ -94,7 +105,8 @@ export default function Description(props) {
                   data={anime.episodes.filter((episode) => !episode.is_trailer)}
                   horizontal={false}
                   episode={episode}
-                  onPress={props.onEpisodePress}
+                  onItemPress={props.onEpisodePress}
+                  onTitleColor={handleTitleColor}
                 />
               </Item.Container>
             </View>
@@ -121,7 +133,8 @@ export default function Description(props) {
                     )}
                     horizontal={false}
                     episode={episode}
-                    onPress={props.onEpisodePress}
+                    onItemPress={props.onEpisodePress}
+                    onTitleColor={handleTitleColor}
                   />
                 </Item.Container>
               </View>
@@ -142,7 +155,11 @@ export default function Description(props) {
 
             <View style={{ flex: 1 }}>
               <Item.Container style={{ width: "100%" }}>
-                <Item data={anime.related_videos} horizontal={false} />
+                <Item
+                  data={anime.related_videos}
+                  horizontal={false}
+                  onItemPress={handleItemPress}
+                />
               </Item.Container>
             </View>
           </ScrollView>

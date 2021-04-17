@@ -7,8 +7,9 @@ import { vw, vh } from "react-native-expo-viewport-units";
 
 import { getTrendingKeywords, search } from "../../utils/api";
 import { isEmpty } from "../../utils/";
+import { useNavigation } from "@react-navigation/native";
 
-import Item from "../../Components/Anime/Item";
+import Item from "../../Components/Item";
 
 export default function Search() {
   const [trendingKeywords, setTrendingKeywords] = useState([]);
@@ -63,9 +64,15 @@ export default function Search() {
 }
 
 Search.List = ({ data }) => {
+  const navigation = useNavigation();
+
+  const handleItemPress = (props) => {
+    navigation.push("Watch", { id: props.id });
+  };
+
   return (
     <Item.Container>
-      <Item data={data} />
+      <Item data={data} onItemPress={handleItemPress} />
     </Item.Container>
   );
 };

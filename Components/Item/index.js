@@ -1,82 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image } from "react-native";
-import tailwind from "tailwind-rn";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { useNavigation } from "@react-navigation/native";
 import { vw } from "react-native-expo-viewport-units";
 
-import { getList } from "../../utils/api";
-import { isEmpty, notifyMessage } from "../../utils/";
+import tailwind from "tailwind-rn";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import list from "../../data/list.json";
 
 export default function Item(props) {
-  const [animeList, setAnimeList] = useState([]);
+  const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
 
-  const navigation = useNavigation();
+  const states = {
+    list: [list, setList],
+    loading: [loading, setLoading],
+  };
 
   if (props.data) {
     useEffect(() => {
-      setAnimeList(props.data);
+      setList(props.data);
     }, [props.data]);
   }
 
   useEffect(() => {
-    setLoading(true);
-    if (!props.data) {
-      const getData = async () => {
-        const list = await getList({ structure_id: props.structure_id });
-        setAnimeList(list);
-        setLoading(false);
-      };
-
-      getData();
-    } else {
-      setAnimeList(props.data);
+    if (props.onMounted) {
+      props.onMounted({ ...props, states });
+    } else if (props.data) {
+      setLoading(true);
+      setList(props.data);
       setLoading(false);
     }
   }, []);
 
-  const handleNewList = async () => {
-    const list = await getList({
-      structure_id: props.structure_id,
-      page: page + 1,
-    });
-
-    if (isEmpty(list)) {
-      return notifyMessage("Hết dữ liệu!");
+  const handleEndReached = () => {
+    if (props.onEndReached) {
+      props.onEndReached({ ...props, states });
     }
-
-    setPage(page + 1);
-
-    const newList = [...animeList, ...list];
-
-    setAnimeList(newList);
   };
 
   const handleShowList = () => {
-    const { structure_id, structure_name } = props;
-
-    navigation.navigate("List", { structure_id, structure_name });
+    if (props.onShowList) {
+      props.onShowList(props);
+    }
   };
 
   const handleItemPress = (id) => {
-    navigation.push("Watch", { id });
+    if (props.onItemPress) {
+      props.onItemPress({ ...props, id });
+    }
   };
 
   return (
     <View style={{ ...tailwind("my-3"), width: "100%" }}>
-      {props.structure_name && (
+      {props.itemName && (
         <View
           style={tailwind("flex flex-row justify-between items-center mb-5")}
         >
           <Text style={tailwind("text-white font-bold text-xl ml-2")}>
-            {props.structure_name}
+            {props.itemName}
           </Text>
-          {props.horizontal && (
+          {props.onShowList && (
             <Text
               style={tailwind("text-gray-500 text-sm mr-2")}
               onPress={handleShowList}
@@ -99,19 +84,15 @@ export default function Item(props) {
             }}
             ListFooterComponent={<View style={{ paddingBottom: 100 }} />}
             horizontal={props.horizontal}
-            data={animeList}
+            data={list}
             numColumns={!props.horizontal ? 2 : false}
             renderItem={({ item: anime }) => {
               return (
                 <View style={tailwind("w-40 mb-5 mx-2")}>
                   <TouchableOpacity
-                    onPress={(_) => {
-                      if (props.onPress) {
-                        props.onPress(anime.referred_object_id || anime._id);
-                      } else {
-                        handleItemPress(anime.referred_object_id || anime._id);
-                      }
-                    }}
+                    onPress={(_) =>
+                      handleItemPress(anime.referred_object_id || anime._id)
+                    }
                   >
                     <Image
                       source={{
@@ -128,7 +109,9 @@ export default function Item(props) {
                     <Text
                       style={{
                         ...tailwind("w-11/12 text-sm"),
-                        color: anime._id === props.episode ? "#ff6500" : "#fff",
+                        color: props.onTitleColor
+                          ? props.onTitleColor({ ...props, anime })
+                          : "#fff",
                       }}
                       numberOfLines={1}
                     >
@@ -147,7 +130,7 @@ export default function Item(props) {
             }}
             keyExtractor={(item) => item._id}
             updateCellsBatchingPeriod={100} // Increase time between renders
-            onEndReached={!props.data ? handleNewList : false}
+            onEndReached={handleEndReached}
             onEndReachedThreshold={0.1}
           />
         </View>

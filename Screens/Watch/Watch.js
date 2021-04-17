@@ -22,7 +22,7 @@ export default function Watch({ route, navigation }) {
 
   const orientation = useOrientation();
 
-  const handleEpisodePress = (episode) => {
+  const handleEpisodePress = ({ id: episode }) => {
     setEpisode(episode);
   };
 
