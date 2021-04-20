@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import { vw } from "react-native-expo-viewport-units";
+import { useNavigation } from "@react-navigation/native";
 
 import tailwind from "tailwind-rn";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-
-import { TouchableOpacity } from "react-native-gesture-handler";
-
-import list from "../../data/list.json";
 
 export default function Item(props) {
   const [list, setList] = useState([]);
@@ -17,6 +14,8 @@ export default function Item(props) {
     list: [list, setList],
     loading: [loading, setLoading],
   };
+
+  const navigation = useNavigation();
 
   if (props.data) {
     useEffect(() => {
@@ -34,16 +33,22 @@ export default function Item(props) {
     }
   }, []);
 
+  const handleRenderItem = (passedData) => {
+    if (props.renderItem) {
+      return props.renderItem({ ...passedData, ...props, handleItemPress });
+    }
+  };
+
   const handleEndReached = () => {
-    if (props.onEndReached) {
-      props.onEndReached({ ...props, states });
+    if (props.onNewList) {
+      props.onNewList({ ...props, states });
     }
   };
 
   const handleShowList = () => {
-    if (props.onShowList) {
-      props.onShowList(props);
-    }
+    navigation.navigate("List", {
+      ...props,
+    });
   };
 
   const handleItemPress = (id) => {
@@ -61,7 +66,7 @@ export default function Item(props) {
           <Text style={tailwind("text-white font-bold text-xl ml-2")}>
             {props.itemName}
           </Text>
-          {props.onShowList && (
+          {props.showList && (
             <Text
               style={tailwind("text-gray-500 text-sm mr-2")}
               onPress={handleShowList}
@@ -86,49 +91,8 @@ export default function Item(props) {
             horizontal={props.horizontal}
             data={list}
             numColumns={!props.horizontal ? 2 : false}
-            renderItem={({ item: anime }) => {
-              return (
-                <View style={tailwind("w-40 mb-5 mx-2")}>
-                  <TouchableOpacity
-                    onPress={(_) =>
-                      handleItemPress(anime.referred_object_id || anime._id)
-                    }
-                  >
-                    <Image
-                      source={{
-                        uri: `${
-                          anime.wide_image || anime.thumb
-                        }?w=282&mode=scale&fmt=webp`,
-                      }}
-                      style={{
-                        ...tailwind("w-full h-24 rounded-md mb-2"),
-                        resizeMode: "cover",
-                      }}
-                    />
-
-                    <Text
-                      style={{
-                        ...tailwind("w-11/12 text-sm"),
-                        color: props.onTitleColor
-                          ? props.onTitleColor({ ...props, anime })
-                          : "#fff",
-                      }}
-                      numberOfLines={1}
-                    >
-                      {anime.title_vie || anime.title}
-                    </Text>
-
-                    <Text
-                      style={tailwind("w-11/12 text-gray-400 text-xs")}
-                      numberOfLines={1}
-                    >
-                      {anime.title_origin || ""}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            }}
-            keyExtractor={(item) => item._id}
+            renderItem={handleRenderItem}
+            keyExtractor={(item) => item._id || item.id}
             updateCellsBatchingPeriod={100} // Increase time between renders
             onEndReached={handleEndReached}
             onEndReachedThreshold={0.1}

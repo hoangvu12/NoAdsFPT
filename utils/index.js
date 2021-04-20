@@ -1,4 +1,4 @@
-import { ToastAndroid, Platform, AlertIOS } from "react-native";
+import { ToastAndroid, Platform, AlertIOS, Image } from "react-native";
 
 export function isEmpty(data) {
   if (!data) return false;
@@ -29,3 +29,22 @@ export function millisToMinutesAndSeconds(millis) {
     seconds
   );
 }
+
+export function urlParse(url) {
+  const [URL, query] = url.split("?");
+  const parts = URL.split("/");
+
+  return {
+    hostname: parts[2],
+    path: parts.slice(3).join("/"),
+    query,
+  };
+}
+
+export const getImageSize = (url) => {
+  return new Promise((resolve, reject) => {
+    Image.getSize(url, (width, height) => {
+      resolve({ width, height });
+    });
+  });
+};

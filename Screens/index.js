@@ -6,7 +6,9 @@ import { AntDesign } from "@expo/vector-icons";
 import Dashboard from "./Dashboard/Dashboard";
 import ShowList from "./ShowList/ShowList";
 import Search from "./Search/Search";
+import Manga from "./Manga";
 import Watch from "./Watch/";
+import Read from "./Read";
 
 const screenOptions = ({ route, navigation }) => ({
   headerStyle: {
@@ -31,7 +33,9 @@ export const options = {
 export default [
   { name: "Dashboard", component: Dashboard, options: { title: "Trang chủ" } },
   { name: "List", component: ShowList, options: { title: "Danh sách" } },
+  { name: "Manga", component: Manga, options: { title: "Thông tin truyện" } },
   { name: "Search", component: Search, options: { title: "Tìm kiếm" } },
+  { name: "Read", component: Read, options: { title: "Đọc truyện" } },
   {
     name: "Watch",
     component: Watch,

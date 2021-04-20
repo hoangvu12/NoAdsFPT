@@ -5,7 +5,7 @@ import Constants from "expo-constants";
 
 import { vw, vh } from "react-native-expo-viewport-units";
 
-import { getTrendingKeywords, search } from "../../utils/api";
+import { getTrendingKeywords, search } from "../../models/Anime";
 import { isEmpty } from "../../utils/";
 import { useNavigation } from "@react-navigation/native";
 

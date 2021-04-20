@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, LogBox } from "react-native";
 import tailwind from "tailwind-rn";
 import { vw, vh } from "react-native-expo-viewport-units";
 import { useNavigation } from "@react-navigation/native";
+import { render } from "../../Components/Anime/render";
 
 import Item from "../../Components/Item";
 import { VideoContext } from "./Store";
@@ -107,6 +108,7 @@ export default function Description(props) {
                   episode={episode}
                   onItemPress={props.onEpisodePress}
                   onTitleColor={handleTitleColor}
+                  renderItem={render}
                 />
               </Item.Container>
             </View>
@@ -135,6 +137,7 @@ export default function Description(props) {
                     episode={episode}
                     onItemPress={props.onEpisodePress}
                     onTitleColor={handleTitleColor}
+                    renderItem={render}
                   />
                 </Item.Container>
               </View>
@@ -159,6 +162,7 @@ export default function Description(props) {
                   data={anime.related_videos}
                   horizontal={false}
                   onItemPress={handleItemPress}
+                  renderItem={render}
                 />
               </Item.Container>
             </View>

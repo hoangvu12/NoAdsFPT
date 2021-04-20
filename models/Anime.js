@@ -1,4 +1,4 @@
-import FPTPlay from "./fptplay";
+import FPTPlay from "../utils/fptplay";
 import axios from "axios";
 
 export async function search({ keyword, per_page = 24, page = 1 }) {

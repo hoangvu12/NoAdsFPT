@@ -3,37 +3,22 @@ import { View, Text, StyleSheet } from "react-native";
 import Item from "../../Components/Item";
 import tailwind from "tailwind-rn";
 import Constants from "expo-constants";
-
-import { getList } from "../../utils/api";
 import { isEmpty, notifyMessage } from "../../utils";
 
 export default function ShowList({ route, navigation }) {
-  const { structure_id, structure_name } = route.params;
+  const { onNewList, getList, ...params } = route.params;
+
   const [page, setPage] = useState(1);
 
-  const handleOnMounted = async (props) => {
-    const [loading, setLoading] = props.states.loading;
+  async function handleNewList(props) {
     const [list, setList] = props.states.list;
 
-    setLoading(true);
+    console.log(page);
+
+    notifyMessage("Đang tải dữ liệu!");
 
     const newList = await getList({
-      structure_id,
-    });
-
-    setLoading(false);
-    setList(newList);
-  };
-
-  const handleItemPress = (props) => {
-    navigation.push("Watch", { id: props.id });
-  };
-
-  const handleNewList = async (props) => {
-    const [list, setList] = props.states.list;
-
-    const newList = await getList({
-      structure_id: structure_id,
+      ...props,
       page: page + 1,
     });
 
@@ -46,17 +31,16 @@ export default function ShowList({ route, navigation }) {
     const mergedList = [...list, ...newList];
 
     setList(mergedList);
-  };
+  }
 
   return (
     <View style={styles.container}>
       <Item.Container>
         <Item
-          itemName={structure_name}
-          onItemPress={handleItemPress}
-          onEndReached={handleNewList}
-          onMounted={handleOnMounted}
+          {...params}
+          onNewList={handleNewList}
           horizontal={false}
+          showList={false}
         />
       </Item.Container>
     </View>

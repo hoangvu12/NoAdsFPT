@@ -1,14 +1,106 @@
 import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet, Image } from "react-native";
+import { View, ScrollView, Text, StyleSheet } from "react-native";
 import tailwind from "tailwind-rn";
 import Item from "../../Components/Item";
 import Constants from "expo-constants";
 import { useNavigation } from "@react-navigation/native";
 
-import { getList } from "../../utils/api";
+import { isEmpty, notifyMessage } from "../../utils";
+
+import { getList as animeGetList } from "../../models/Anime";
+import { getList as mangaGetList } from "../../models/Manga";
+
+import { render as animeRender } from "../../Components/Anime/render";
+import { render as mangaRender } from "../../Components/Manga/render";
 
 export default function Dashboard() {
+  const animeStructures = [
+    {
+      structure_id: "560e368317dc1310a164d2c7",
+      structure_name: "Đề cử",
+    },
+    {
+      structure_id: "5e732aa12089bd0041850ac3",
+      structure_name: "Top anime đặc sắc",
+    },
+  ];
+
+  const mangaStructures = [
+    { type: "recommended", name: "Đề cử" },
+    { type: "latest", name: "Mới cập nhật" },
+  ];
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={tailwind("w-full mb-5")}>
+        <Text
+          style={tailwind("text-center text-white text-2xl font-bold ml-2")}
+        >
+          Anime
+        </Text>
+        <Item.Container>
+          <Anime structures={animeStructures} />
+        </Item.Container>
+      </View>
+      <View style={tailwind("w-full")}>
+        <Text
+          style={tailwind("text-center text-white text-2xl font-bold ml-2")}
+        >
+          Manga
+        </Text>
+        <Item.Container>
+          <Manga structures={mangaStructures} />
+        </Item.Container>
+      </View>
+    </ScrollView>
+  );
+}
+
+const Manga = (props) => {
+  const [page, setPage] = useState(1);
   const navigation = useNavigation();
+
+  const handleOnMounted = async (props) => {
+    const [loading, setLoading] = props.states.loading;
+    const [list, setList] = props.states.list;
+
+    // console.log(props.type);
+
+    setLoading(true);
+
+    const newList = await mangaGetList({
+      type: props.type,
+    });
+
+    setLoading(false);
+    setList(newList);
+  };
+
+  const handleItemPress = ({ id: data }) => {
+    navigation.push("Manga", { id: data.id, slug: data.slug.name });
+
+    // console.log("Item pressed", props);
+  };
+
+  return props.structures.map((structure, index) => (
+    <Item
+      type={structure.type}
+      itemName={structure.name}
+      key={index}
+      onItemPress={handleItemPress}
+      onMounted={handleOnMounted}
+      getList={mangaGetList}
+      renderItem={mangaRender}
+      horizontal
+      showList
+    />
+  ));
+};
+
+const Anime = (props) => {
+  const navigation = useNavigation();
+
+  const [page, setPage] = useState(1);
 
   const handleOnMounted = async (props) => {
     const [loading, setLoading] = props.states.loading;
@@ -16,7 +108,7 @@ export default function Dashboard() {
 
     setLoading(true);
 
-    const newList = await getList({
+    const newList = await animeGetList({
       structure_id: props.structure_id,
     });
 
@@ -28,41 +120,20 @@ export default function Dashboard() {
     navigation.push("Watch", { id: props.id });
   };
 
-  const handleShowList = (props) => {
-    const { structure_id, structure_name } = props;
-
-    navigation.navigate("List", { structure_id, structure_name });
-  };
-
-  const structures = [
-    {
-      structure_id: "560e368317dc1310a164d2c7",
-      structure_name: "Anime",
-    },
-    {
-      structure_id: "5e732aa12089bd0041850ac3",
-      structure_name: "Top anime đặc sắc",
-    },
-  ];
-
-  return (
-    <View style={styles.container}>
-      <Item.Container>
-        {structures.map((structure, index) => (
-          <Item
-            {...structure}
-            itemName={structure.structure_name}
-            key={index}
-            onItemPress={handleItemPress}
-            onShowList={handleShowList}
-            onMounted={handleOnMounted}
-            horizontal
-          />
-        ))}
-      </Item.Container>
-    </View>
-  );
-}
+  return props.structures.map((structure, index) => (
+    <Item
+      {...structure}
+      itemName={structure.structure_name}
+      key={index}
+      onItemPress={handleItemPress}
+      onMounted={handleOnMounted}
+      getList={animeGetList}
+      renderItem={animeRender}
+      horizontal
+      showList
+    />
+  ));
+};
 
 const styles = StyleSheet.create({
   container: {

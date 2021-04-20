@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 
 import Video from "../../Components/Video";
 
-import { getAnimeInfo, getVideoSource } from "../../utils/api";
+import { getAnimeInfo, getVideoSource } from "../../models/Anime";
 import { isEmpty } from "../../utils/";
 import useOrientation from "../../hooks/useOrientation";
 

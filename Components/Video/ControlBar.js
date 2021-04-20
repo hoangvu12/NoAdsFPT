@@ -58,8 +58,6 @@ export default function ControlBar(props) {
 
       <TouchableOpacity
         onPress={async () => {
-          console.log(orientation);
-
           await ScreenOrientation.lockAsync(
             orientation === "LANDSCAPE"
               ? ScreenOrientation.OrientationLock.PORTRAIT
