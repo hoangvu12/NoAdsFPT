@@ -11,11 +11,7 @@ import {
 import tailwind from "tailwind-rn";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-
 import { getInfo } from "../../models/Manga";
-
-import manga from "../../data/manga.json";
 
 export default function Manga({ route, navigation }) {
   const [info, setInfo] = useState({});
