@@ -31,3 +31,7 @@ export async function getImages({ nameSlug, chapterSlug, chapterId }) {
 
   return data.data;
 }
+
+export function getImageUrl(url) {
+  return `${BASE_URL}/image/${encodeURIComponent(url)}`;
+}

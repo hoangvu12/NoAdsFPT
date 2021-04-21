@@ -8,7 +8,7 @@ import { vw, vh } from "react-native-expo-viewport-units";
 import { getTrendingKeywords, search } from "../../models/Anime";
 import { isEmpty } from "../../utils/";
 import { useNavigation } from "@react-navigation/native";
-
+import { render } from "../../Components/Anime/render";
 import Item from "../../Components/Item";
 
 export default function Search() {
@@ -72,7 +72,12 @@ Search.List = ({ data }) => {
 
   return (
     <Item.Container>
-      <Item data={data} onItemPress={handleItemPress} />
+      <Item
+        data={data}
+        onItemPress={handleItemPress}
+        showList={false}
+        renderItem={render}
+      />
     </Item.Container>
   );
 };

@@ -1,7 +1,6 @@
 import React, { memo } from "react";
-import { Image, StyleSheet } from "react-native";
-import tailwind from "tailwind-rn";
-import { vh, vw } from "react-native-expo-viewport-units";
+import { Dimensions } from "react-native";
+import Image from "react-native-scalable-image";
 
 function Item({ item }) {
   return (
@@ -9,19 +8,10 @@ function Item({ item }) {
       source={{
         uri: item,
       }}
-      style={styles.image}
+      width={Dimensions.get("window").width}
+      // style={styles.image}
     />
   );
 }
 
 export default memo(Item);
-
-const styles = StyleSheet.create({
-  image: {
-    ...tailwind("rounded-md"),
-    resizeMode: "stretch",
-    width: vw(95),
-    height: vh(80),
-    alignSelf: "center",
-  },
-});

@@ -1,25 +1,18 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import {
-  View,
-  Text,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  Picker,
-  StyleSheet,
-} from "react-native";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { View, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import tailwind from "tailwind-rn";
-import { vh, vw } from "react-native-expo-viewport-units";
 import { AntDesign } from "@expo/vector-icons";
-import { OptimizedFlatList } from "react-native-optimized-flatlist";
-import Item from "./Item";
+import { Picker } from "@react-native-picker/picker";
 
-import { getImages } from "../../models/Manga";
+import Item from "./Item";
+import { getImages, getImageUrl } from "../../models/Manga";
 import { isEmpty } from "../../utils";
 
 export default function Read({ route, navigation }) {
   const { nameSlug, chapterSlug, chapters } = route.params;
   const [chapterIndex, setChapterIndex] = useState(0);
+
+  const flatListRef = useRef();
 
   const [chapterId, setChapterId] = useState(route.params.chapterId);
   const ITEM_HEIGHT = 800;
@@ -46,14 +39,11 @@ export default function Read({ route, navigation }) {
     const getData = async () => {
       setLoading(true);
 
+      setImages([]);
+
       const images = await getImages({ nameSlug, chapterId, chapterSlug });
 
-      let fullUrlImgs = images.map(
-        (image) =>
-          `http://nguyenvu-api.com/nettruyen/image?url=${encodeURIComponent(
-            image
-          )}`
-      );
+      let fullUrlImgs = images.map((image) => getImageUrl(image));
 
       setImages(fullUrlImgs);
 
@@ -78,19 +68,20 @@ export default function Read({ route, navigation }) {
         }}
       >
         <TouchableOpacity
-          disabled={chapterIndex >= chapters.length}
+          disabled={chapterIndex >= chapters.length - 1}
           style={tailwind("ml-5")}
           onPress={(_) => {
             const chapter = chapters[chapterIndex + 1];
 
             setChapterId(chapter.id);
+            flatListRef.current.scrollToOffset({ animated: true, y: 0 });
           }}
         >
           <AntDesign
             name="arrowleft"
             size={24}
             color={
-              chapterIndex >= chapters.length
+              chapterIndex >= chapters.length - 1
                 ? tailwind("text-gray-400").color
                 : "white"
             }
@@ -100,10 +91,8 @@ export default function Read({ route, navigation }) {
           selectedValue={chapterId}
           style={{
             height: 50,
-            minWidth: 130,
-            backgroundColor: "white",
             color: "white",
-            textAlign: "center",
+            flex: 1,
           }}
           onValueChange={(itemValue, itemIndex) => setChapterId(itemValue)}
         >
@@ -122,6 +111,7 @@ export default function Read({ route, navigation }) {
             const chapter = chapters[chapterIndex - 1];
 
             setChapterId(chapter.id);
+            flatListRef.current.scrollToOffset({ animated: true, y: 0 });
           }}
         >
           <AntDesign
@@ -135,10 +125,8 @@ export default function Read({ route, navigation }) {
       </View>
 
       {!isEmpty(images) && (
-        <OptimizedFlatList
-          initialNumToRender={5}
-          maxToRenderPerBatch={10}
-          windowSize={10}
+        <FlatList
+          ref={flatListRef}
           data={images}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
