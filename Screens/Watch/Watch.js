@@ -41,7 +41,13 @@ export default function Watch({ route, navigation }) {
     const getData = async () => {
       const { url } = await getVideoSource({ id, episode });
 
-      setVideoUrl(url);
+      let videoUrl = url;
+
+      if (!videoUrl.includes("https")) {
+        videoUrl = url.replace("http", "https");
+      }
+
+      setVideoUrl(videoUrl);
     };
 
     getData();

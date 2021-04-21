@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://nguyenvu-api.com/nettruyen";
+const BASE_URL = "https://nguyenvu-stuff.glitch.me/nettruyen";
 
 export async function getList({
   type = "recommended",
