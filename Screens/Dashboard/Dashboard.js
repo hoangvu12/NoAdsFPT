@@ -77,7 +77,10 @@ const Manga = (props) => {
   };
 
   const handleItemPress = ({ id: data }) => {
-    navigation.push("Manga", { id: data.id, slug: data.slug.name });
+    navigation.push("Manga", {
+      id: data.id,
+      slug: data.slug.name || data.slug,
+    });
 
     // console.log("Item pressed", props);
   };

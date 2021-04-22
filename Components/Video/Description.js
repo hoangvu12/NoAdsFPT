@@ -90,7 +90,7 @@ export default function Description(props) {
           </ScrollView>
         </View>
         <View style={styles.column}>
-          <ScrollView>
+          <ScrollView style={{ flex: 1 }}>
             <View style={tailwind("flex justify-center mb-5")}>
               <Text
                 style={tailwind("text-white text-base font-bold")}
@@ -101,7 +101,7 @@ export default function Description(props) {
             </View>
 
             <View style={{ flex: 1 }}>
-              <Item.Container style={{ width: "100%" }}>
+              <Item.Container style={{ flex: 1 }}>
                 <Item
                   data={anime.episodes.filter((episode) => !episode.is_trailer)}
                   horizontal={false}

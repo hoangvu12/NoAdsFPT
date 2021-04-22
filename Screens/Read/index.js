@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import tailwind from "tailwind-rn";
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Item from "./Item";
 import { getImages, getImageUrl } from "../../models/Manga";
@@ -15,22 +16,12 @@ export default function Read({ route, navigation }) {
   const flatListRef = useRef();
 
   const [chapterId, setChapterId] = useState(route.params.chapterId);
-  const ITEM_HEIGHT = 800;
 
   const renderItem = useCallback(({ item }) => {
     return <Item item={item} />;
   }, []);
 
   const keyExtractor = useCallback((_, index) => index.toString(), []);
-
-  const getItemLayout = useCallback(
-    (data, index) => ({
-      length: ITEM_HEIGHT,
-      offset: ITEM_HEIGHT * index,
-      index,
-    }),
-    []
-  );
 
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,9 +41,14 @@ export default function Read({ route, navigation }) {
       setLoading(false);
     };
 
+    const storeData = async () => {
+      await AsyncStorage.setItem(nameSlug, chapterId.toString());
+    };
+
     setChapterIndex(chapters.findIndex((chapter) => chapter.id === chapterId));
 
     getData();
+    storeData();
   }, [chapterId]);
 
   return (
@@ -126,11 +122,15 @@ export default function Read({ route, navigation }) {
 
       {!isEmpty(images) && (
         <FlatList
+          initialNumToRender={10}
+          maxToRenderPerBatch={20}
+          windowSize={10}
           ref={flatListRef}
           data={images}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
-          getItemLayout={getItemLayout}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
         />
       )}
     </View>

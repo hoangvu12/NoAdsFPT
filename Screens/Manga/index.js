@@ -10,12 +10,15 @@ import {
 } from "react-native";
 import tailwind from "tailwind-rn";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { getInfo } from "../../models/Manga";
+import { isEmpty } from "../../utils";
 
 export default function Manga({ route, navigation }) {
   const [info, setInfo] = useState({});
   const [loading, setLoading] = useState(true);
+  const [savedChapter, setSavedChapter] = useState({});
 
   const { slug, id } = route.params;
 
@@ -37,7 +40,15 @@ export default function Manga({ route, navigation }) {
         id,
       });
 
+      const savedChapterId = await AsyncStorage.getItem(slug);
+      const savedChapter = info.chapters.find(
+        (chapter) => chapter.id === Number(savedChapterId)
+      );
+
+      setSavedChapter(savedChapter || []);
+
       setInfo(info);
+
       setLoading(false);
     };
 
@@ -130,6 +141,7 @@ export default function Manga({ route, navigation }) {
                 });
               }}
             />
+
             <Button
               title="Đọc mới nhất"
               onPress={(_) => {
@@ -144,6 +156,26 @@ export default function Manga({ route, navigation }) {
               }}
             />
           </View>
+
+          {!isEmpty(savedChapter) && (
+            <View
+              style={tailwind(
+                "flex-row items-center justify-center w-4/6 my-5"
+              )}
+            >
+              <Button
+                title={`Đọc ${savedChapter.name}`}
+                onPress={(_) => {
+                  navigation.navigate("Read", {
+                    nameSlug: slug,
+                    chapterId: savedChapter.id,
+                    chapterSlug: savedChapter.slug,
+                    chapters: info.chapters,
+                  });
+                }}
+              />
+            </View>
+          )}
 
           <View style={tailwind("w-5/6 my-5")}>
             <Text style={[styles.text, tailwind("text-xl font-bold")]}>

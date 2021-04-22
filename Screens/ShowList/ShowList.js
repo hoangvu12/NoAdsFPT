@@ -13,8 +13,6 @@ export default function ShowList({ route, navigation }) {
   async function handleNewList(props) {
     const [list, setList] = props.states.list;
 
-    console.log(page);
-
     notifyMessage("Đang tải dữ liệu!");
 
     const newList = await getList({
@@ -35,7 +33,7 @@ export default function ShowList({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Item.Container>
+      <Item.Container style={{ flex: 1 }}>
         <Item
           {...params}
           onNewList={handleNewList}
@@ -49,9 +47,8 @@ export default function ShowList({ route, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    ...tailwind("h-full w-full"),
+    flex: 1,
     backgroundColor: "#18191A",
     paddingTop: Constants.statusBarHeight,
-    // flex: 1,
   },
 });

@@ -10,6 +10,7 @@ import { Entypo } from "@expo/vector-icons";
 import { Video as ExpoVideo } from "expo-av";
 import tailwind from "tailwind-rn";
 import { useNavigation } from "@react-navigation/native";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 
 import { VideoContext } from "./Store";
 import { isEmpty } from "../../utils";
@@ -37,9 +38,11 @@ export default function Video(props) {
 
   useEffect(() => {
     if (orientation === "LANDSCAPE") {
+      activateKeepAwake();
       return navigation.setOptions({ headerShown: false });
     }
 
+    deactivateKeepAwake();
     navigation.setOptions({ headerShown: true });
   }, [orientation]);
 

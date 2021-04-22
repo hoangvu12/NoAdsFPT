@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { vw } from "react-native-expo-viewport-units";
 import { useNavigation } from "@react-navigation/native";
+import { OptimizedFlatList } from "react-native-optimized-flatlist";
 
 import tailwind from "tailwind-rn";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -39,9 +40,9 @@ export default function Item(props) {
     }
   };
 
-  const handleEndReached = () => {
+  const handleEndReached = (data) => {
     if (props.onNewList) {
-      props.onNewList({ ...props, states });
+      props.onNewList({ ...props, ...data, states });
     }
   };
 
@@ -58,7 +59,7 @@ export default function Item(props) {
   };
 
   return (
-    <View style={{ ...tailwind("my-3"), width: "100%" }}>
+    <View style={{ ...tailwind("my-3"), flex: 1 }}>
       {props.itemName && (
         <View
           style={tailwind("flex flex-row justify-between items-center mb-5")}
@@ -80,22 +81,22 @@ export default function Item(props) {
       {loading && <Item.Loader placeholderNumber={props.horizontal ? 1 : 3} />}
 
       {!loading && (
-        <View>
+        <View style={{ flex: 1 }}>
           <FlatList
-            style={{ flexGrow: 1 }}
             contentContainerStyle={{
               ...tailwind("flex items-center"),
               // flex: 1,
             }}
-            ListFooterComponent={<View style={{ paddingBottom: 100 }} />}
+            bounces
             horizontal={props.horizontal}
             data={list}
             numColumns={!props.horizontal ? 2 : false}
             renderItem={handleRenderItem}
             keyExtractor={(item) => item._id || item.id}
-            updateCellsBatchingPeriod={100} // Increase time between renders
             onEndReached={handleEndReached}
             onEndReachedThreshold={0.1}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
           />
         </View>
       )}
