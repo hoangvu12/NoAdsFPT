@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, ScrollView, Text, StyleSheet } from "react-native";
 import tailwind from "tailwind-rn";
 import Item from "../../Components/Item";
@@ -58,34 +58,6 @@ export default function Dashboard() {
 
 const Manga = (props) => {
   const navigation = useNavigation();
-
-  // useEffect(() => {
-  //   const getData = async () => {
-  //     const savedMangaIds = await AsyncStorage.getAllKeys();
-
-  //     const savedManga = await AsyncStorage.multiGet(
-  //       savedMangaIds.filter((id) => Number(id))
-  //     );
-
-  //     let promiseManga = savedManga.map(async ([id, rawInfo]) => {
-  //       const { mangaId, mangaSlug, chapterId } = JSON.parse(rawInfo);
-
-  //       const info = await getInfo({ slug: mangaSlug, id: mangaId });
-
-  //       const latestChapter = info.chapters.find(
-  //         (chapter) => chapter.id === chapterId
-  //       );
-
-  //       return { ...info, latestChapter: latestChapter.name };
-  //     });
-
-  //     const manga = await Promise.all(promiseManga);
-
-  //     setSavedManga(manga);
-  //   };
-
-  //   getData();
-  // }, []);
 
   const handleOnMounted = async (props) => {
     const [loading, setLoading] = props.states.loading;

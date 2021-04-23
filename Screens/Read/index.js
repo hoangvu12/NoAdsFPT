@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { View, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  Alert,
+  RefreshControl,
+} from "react-native";
 import tailwind from "tailwind-rn";
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
@@ -7,40 +14,52 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import Item from "./Item";
 import { getImages, getImageUrl } from "../../models/Manga";
-import { isEmpty } from "../../utils";
+import { isEmpty, notifyMessage } from "../../utils";
 
-export default function Read({ route, navigation }) {
+const showAlert = ({ chapters, chapterIndex, setChapterId }) =>
+  Alert.alert("Thông báo", "Sang chapter tiếp theo?", [
+    {
+      text: "Ở lại",
+      style: "cancel",
+    },
+    {
+      text: "Đồng ý",
+      onPress: () => {
+        const chapter = chapters[chapterIndex - 1];
+
+        setChapterId(chapter.id);
+      },
+    },
+  ]);
+
+export default function Read({ route }) {
   const { mangaSlug, mangaId, chapterSlug, chapters } = route.params;
-  const [chapterIndex, setChapterIndex] = useState(0);
 
   const flatListRef = useRef();
 
+  const [images, setImages] = useState([]);
+  const [chapterIndex, setChapterIndex] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
   const [chapterId, setChapterId] = useState(route.params.chapterId);
 
-  const renderItem = useCallback(({ item }) => {
-    return <Item item={item} />;
+  const renderItem = useCallback(({ item }) => <Item item={item} />, []);
+  const keyExtractor = useCallback((_, index) => index.toString(), []);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getData().then(() => setRefreshing(false));
   }, []);
 
-  const keyExtractor = useCallback((_, index) => index.toString(), []);
+  const getData = async () => {
+    setImages([]);
 
-  const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
+    const images = await getImages({ mangaSlug, chapterId, chapterSlug });
+
+    let fullUrlImgs = images.map((image) => getImageUrl(image));
+
+    setImages(fullUrlImgs);
+  };
 
   useEffect(() => {
-    const getData = async () => {
-      setLoading(true);
-
-      setImages([]);
-
-      const images = await getImages({ mangaSlug, chapterId, chapterSlug });
-
-      let fullUrlImgs = images.map((image) => getImageUrl(image));
-
-      setImages(fullUrlImgs);
-
-      setLoading(false);
-    };
-
     const storeData = async () => {
       await AsyncStorage.setItem(
         mangaId,
@@ -56,16 +75,7 @@ export default function Read({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          height: 40,
-          width: "100%",
-          backgroundColor: "#18191A",
-          justifyContent: "space-between",
-          flexDirection: "row",
-          alignItems: "center",
-        }}
-      >
+      <View style={styles.stickyHeader}>
         <TouchableOpacity
           disabled={chapterIndex >= chapters.length - 1}
           style={tailwind("ml-5")}
@@ -88,11 +98,7 @@ export default function Read({ route, navigation }) {
         </TouchableOpacity>
         <Picker
           selectedValue={chapterId}
-          style={{
-            height: 50,
-            color: "white",
-            flex: 1,
-          }}
+          style={styles.picker}
           onValueChange={(itemValue, itemIndex) => setChapterId(itemValue)}
         >
           {chapters.map((chapter) => (
@@ -128,12 +134,19 @@ export default function Read({ route, navigation }) {
           initialNumToRender={10}
           maxToRenderPerBatch={20}
           windowSize={10}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           ref={flatListRef}
           data={images}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
+          onEndReached={() =>
+            showAlert({ setChapterId, chapters, chapterIndex })
+          }
+          onEndReachedThreshold={0.1}
         />
       )}
     </View>
@@ -143,6 +156,19 @@ export default function Read({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#18191A",
+    flex: 1,
+  },
+  stickyHeader: {
+    height: 40,
+    width: "100%",
+    backgroundColor: "#18191A",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  picker: {
+    height: 50,
+    color: "white",
     flex: 1,
   },
 });
