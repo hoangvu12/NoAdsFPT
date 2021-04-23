@@ -24,8 +24,8 @@ export async function getInfo({ slug, id }) {
   return data.data;
 }
 
-export async function getImages({ nameSlug, chapterSlug, chapterId }) {
-  const URL = `${BASE_URL}/images?nameSlug=${nameSlug}&chapterSlug=${chapterSlug}&chapterId=${chapterId}`;
+export async function getImages({ mangaSlug, chapterSlug, chapterId }) {
+  const URL = `${BASE_URL}/images?nameSlug=${mangaSlug}&chapterSlug=${chapterSlug}&chapterId=${chapterId}`;
 
   const { data } = await axios.get(URL);
 

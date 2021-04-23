@@ -24,10 +24,11 @@ export default function Manga({ route, navigation }) {
 
   const handleChapterPress = ({ slug: chapterSlug, id: chapterId }) => {
     navigation.navigate("Read", {
-      nameSlug: slug,
+      mangaSlug: slug,
       chapterSlug,
       chapterId,
       chapters: info.chapters,
+      mangaId: id,
     });
   };
 
@@ -40,12 +41,16 @@ export default function Manga({ route, navigation }) {
         id,
       });
 
-      const savedChapterId = await AsyncStorage.getItem(slug);
-      const savedChapter = info.chapters.find(
-        (chapter) => chapter.id === Number(savedChapterId)
-      );
+      const savedInfo = await AsyncStorage.getItem(id);
 
-      setSavedChapter(savedChapter || []);
+      if (savedInfo) {
+        const { chapterId } = JSON.parse(savedInfo);
+        const savedChapter = info.chapters.find(
+          (chapter) => chapter.id === Number(chapterId)
+        );
+
+        setSavedChapter(savedChapter || []);
+      }
 
       setInfo(info);
 
@@ -134,10 +139,11 @@ export default function Manga({ route, navigation }) {
                 const firstChapter = info.chapters[info.chapters.length - 1];
 
                 navigation.navigate("Read", {
-                  nameSlug: slug,
+                  mangaSlug: slug,
                   chapterId: firstChapter.id,
                   chapterSlug: firstChapter.slug,
                   chapters: info.chapters,
+                  mangaId: id,
                 });
               }}
             />
@@ -148,10 +154,11 @@ export default function Manga({ route, navigation }) {
                 const lastChapter = info.chapters[0];
 
                 navigation.navigate("Read", {
-                  nameSlug: slug,
+                  mangaSlug: slug,
                   chapterId: lastChapter.id,
                   chapterSlug: lastChapter.slug,
                   chapters: info.chapters,
+                  mangaId: id,
                 });
               }}
             />
@@ -167,10 +174,11 @@ export default function Manga({ route, navigation }) {
                 title={`Đọc ${savedChapter.name}`}
                 onPress={(_) => {
                   navigation.navigate("Read", {
-                    nameSlug: slug,
+                    mangaSlug: slug,
                     chapterId: savedChapter.id,
                     chapterSlug: savedChapter.slug,
                     chapters: info.chapters,
+                    mangaId: id,
                   });
                 }}
               />

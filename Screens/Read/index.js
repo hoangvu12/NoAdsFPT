@@ -10,7 +10,7 @@ import { getImages, getImageUrl } from "../../models/Manga";
 import { isEmpty } from "../../utils";
 
 export default function Read({ route, navigation }) {
-  const { nameSlug, chapterSlug, chapters } = route.params;
+  const { mangaSlug, mangaId, chapterSlug, chapters } = route.params;
   const [chapterIndex, setChapterIndex] = useState(0);
 
   const flatListRef = useRef();
@@ -32,7 +32,7 @@ export default function Read({ route, navigation }) {
 
       setImages([]);
 
-      const images = await getImages({ nameSlug, chapterId, chapterSlug });
+      const images = await getImages({ mangaSlug, chapterId, chapterSlug });
 
       let fullUrlImgs = images.map((image) => getImageUrl(image));
 
@@ -42,7 +42,10 @@ export default function Read({ route, navigation }) {
     };
 
     const storeData = async () => {
-      await AsyncStorage.setItem(nameSlug, chapterId.toString());
+      await AsyncStorage.setItem(
+        mangaId,
+        JSON.stringify({ mangaId, mangaSlug, chapterId })
+      );
     };
 
     setChapterIndex(chapters.findIndex((chapter) => chapter.id === chapterId));

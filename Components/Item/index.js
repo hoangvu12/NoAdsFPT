@@ -85,7 +85,6 @@ export default function Item(props) {
           <FlatList
             contentContainerStyle={{
               ...tailwind("flex items-center"),
-              // flex: 1,
             }}
             bounces
             horizontal={props.horizontal}

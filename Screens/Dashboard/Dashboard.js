@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, ScrollView, Text, StyleSheet } from "react-native";
 import tailwind from "tailwind-rn";
 import Item from "../../Components/Item";
-import Constants from "expo-constants";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { isEmpty, notifyMessage } from "../../utils";
+import { getInfo } from "../../models/Manga";
 
 import { getList as animeGetList } from "../../models/Anime";
 import { getList as mangaGetList } from "../../models/Manga";
@@ -31,23 +31,23 @@ export default function Dashboard() {
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={tailwind("w-full mb-5")}>
-        <Text
-          style={tailwind("text-center text-white text-2xl font-bold ml-2")}
-        >
+    <ScrollView style={styles.container} stickyHeaderIndices={[0, 2]}>
+      <View style={{ backgroundColor: "#18191A" }}>
+        <Text style={tailwind("text-center text-white text-2xl font-bold")}>
           Anime
         </Text>
+      </View>
+      <View style={tailwind("w-full mb-5")}>
         <Item.Container>
           <Anime structures={animeStructures} />
         </Item.Container>
       </View>
-      <View style={tailwind("w-full")}>
-        <Text
-          style={tailwind("text-center text-white text-2xl font-bold ml-2")}
-        >
+      <View style={{ backgroundColor: "#18191A" }}>
+        <Text style={tailwind("text-center text-white text-2xl font-bold")}>
           Manga
         </Text>
+      </View>
+      <View style={tailwind("w-full")}>
         <Item.Container>
           <Manga structures={mangaStructures} />
         </Item.Container>
@@ -57,14 +57,39 @@ export default function Dashboard() {
 }
 
 const Manga = (props) => {
-  const [page, setPage] = useState(1);
   const navigation = useNavigation();
+
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     const savedMangaIds = await AsyncStorage.getAllKeys();
+
+  //     const savedManga = await AsyncStorage.multiGet(
+  //       savedMangaIds.filter((id) => Number(id))
+  //     );
+
+  //     let promiseManga = savedManga.map(async ([id, rawInfo]) => {
+  //       const { mangaId, mangaSlug, chapterId } = JSON.parse(rawInfo);
+
+  //       const info = await getInfo({ slug: mangaSlug, id: mangaId });
+
+  //       const latestChapter = info.chapters.find(
+  //         (chapter) => chapter.id === chapterId
+  //       );
+
+  //       return { ...info, latestChapter: latestChapter.name };
+  //     });
+
+  //     const manga = await Promise.all(promiseManga);
+
+  //     setSavedManga(manga);
+  //   };
+
+  //   getData();
+  // }, []);
 
   const handleOnMounted = async (props) => {
     const [loading, setLoading] = props.states.loading;
     const [list, setList] = props.states.list;
-
-    // console.log(props.type);
 
     setLoading(true);
 
@@ -81,23 +106,61 @@ const Manga = (props) => {
       id: data.id,
       slug: data.slug.name || data.slug,
     });
-
-    // console.log("Item pressed", props);
   };
 
-  return props.structures.map((structure, index) => (
-    <Item
-      type={structure.type}
-      itemName={structure.name}
-      key={index}
-      onItemPress={handleItemPress}
-      onMounted={handleOnMounted}
-      getList={mangaGetList}
-      renderItem={mangaRender}
-      horizontal
-      showList
-    />
-  ));
+  return (
+    <>
+      <Item
+        onMounted={async ({ states }) => {
+          const [loading, setLoading] = states.loading;
+          const [list, setList] = states.list;
+
+          setLoading(true);
+
+          const savedMangaIds = await AsyncStorage.getAllKeys();
+
+          const savedManga = await AsyncStorage.multiGet(
+            savedMangaIds.filter((id) => Number(id))
+          );
+
+          let promiseManga = savedManga.map(async ([id, rawInfo]) => {
+            const { mangaId, mangaSlug, chapterId } = JSON.parse(rawInfo);
+
+            const info = await getInfo({ slug: mangaSlug, id: mangaId });
+
+            const latestChapter = info.chapters.find(
+              (chapter) => chapter.id === chapterId
+            );
+
+            return { ...info, latestChapter: latestChapter.name };
+          });
+
+          const manga = await Promise.all(promiseManga);
+
+          setLoading(false);
+          setList(manga);
+        }}
+        itemName="Xem gần đây"
+        onItemPress={handleItemPress}
+        renderItem={mangaRender}
+        horizontal
+      />
+
+      {props.structures.map((structure, index) => (
+        <Item
+          type={structure.type}
+          itemName={structure.name}
+          key={index}
+          onItemPress={handleItemPress}
+          onMounted={handleOnMounted}
+          getList={mangaGetList}
+          renderItem={mangaRender}
+          horizontal
+          showList
+        />
+      ))}
+    </>
+  );
 };
 
 const Anime = (props) => {
@@ -142,6 +205,6 @@ const styles = StyleSheet.create({
   container: {
     ...tailwind("h-full w-full"),
     backgroundColor: "#18191A",
-    paddingTop: Constants.statusBarHeight,
+    // paddingTop: Constants.statusBarHeight,
   },
 });
