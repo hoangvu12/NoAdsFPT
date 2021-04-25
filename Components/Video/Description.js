@@ -33,7 +33,7 @@ export default function Description(props) {
   };
 
   const handleNewList = (props) => {
-    if (itemsShow >= props.data.length) {
+    if (itemsShow >= anime.episodes.length) {
       return notifyMessage("Hết dữ liệu");
     }
 
