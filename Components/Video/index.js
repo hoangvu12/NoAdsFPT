@@ -87,7 +87,7 @@ export default function Video(props) {
           )}
         >
           <ExpoVideo
-            shouldPlay
+            shouldPlay={false}
             ref={video}
             style={tailwind("h-full w-full")}
             usePoster
@@ -96,11 +96,6 @@ export default function Video(props) {
               overrideFileExtensionAndroid: "m3u8",
             }}
             resizeMode={ExpoVideo.RESIZE_MODE_CONTAIN}
-            // onPlaybackStatusUpdate={(playback) => {
-            //   console.log(playback);
-
-            //   setStatus(() => playback);
-            // }}
           />
 
           {!isEmpty(status) && showControls && !isLocked && (
@@ -151,8 +146,6 @@ Video.Description = Description;
 
 const styles = StyleSheet.create({
   container: {
-    // ...tailwind("h-full w-full"),
     backgroundColor: "#18191A",
-    // flex: 1,
   },
 });

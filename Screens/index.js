@@ -9,6 +9,7 @@ import Search from "./Search/Search";
 import Manga from "./Manga";
 import Watch from "./Watch/";
 import Read from "./Read";
+import Test from "./Test";
 
 const screenOptions = ({ route, navigation }) => ({
   headerStyle: {
@@ -36,6 +37,7 @@ export default [
   { name: "Manga", component: Manga, options: { title: "Thông tin truyện" } },
   { name: "Search", component: Search, options: { title: "Tìm kiếm" } },
   { name: "Read", component: Read, options: { title: "Đọc truyện" } },
+  { name: "Test", component: Test, options: { title: "Test" } },
   {
     name: "Watch",
     component: Watch,

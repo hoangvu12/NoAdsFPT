@@ -25,58 +25,79 @@ export default function ControlBar(props) {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={(_) => setIsLocked(!isLocked)}>
-        <Entypo
-          name={isLocked ? "lock-open" : "lock"}
-          size={20}
-          color="white"
-          style={tailwind("ml-2")}
+    <>
+      <View style={styles.buttonContainer}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            onPress={(_) => setIsLocked(!isLocked)}
+            style={tailwind("mr-2")}
+          >
+            <Entypo
+              name={isLocked ? "lock-open" : "lock"}
+              size={20}
+              color="white"
+              style={tailwind("ml-2")}
+            />
+          </TouchableOpacity>
+
+          <Text style={tailwind("text-white")}>
+            {millisToMinutesAndSeconds(status.positionMillis)}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Text style={tailwind("text-white")}>
+            {millisToMinutesAndSeconds(status.durationMillis)}
+          </Text>
+
+          <TouchableOpacity
+            onPress={async () => {
+              await ScreenOrientation.lockAsync(
+                orientation === "LANDSCAPE"
+                  ? ScreenOrientation.OrientationLock.PORTRAIT
+                  : ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
+              );
+            }}
+            style={tailwind("ml-2")}
+          >
+            <MaterialCommunityIcons name="fullscreen" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.sliderContainer}>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={status.durationMillis}
+          value={status.positionMillis}
+          minimumTrackTintColor="#FF6500"
+          maximumTrackTintColor="#fff"
+          thumbTintColor="#FF6500"
+          onValueChange={handleSlideDrag}
         />
-      </TouchableOpacity>
-
-      <Text style={tailwind("text-white")}>
-        {millisToMinutesAndSeconds(status.positionMillis)}
-      </Text>
-
-      <Slider
-        style={{ width: 200, height: 40 }}
-        minimumValue={0}
-        maximumValue={status.durationMillis}
-        value={status.positionMillis}
-        minimumTrackTintColor="#FF6500"
-        maximumTrackTintColor="#fff"
-        thumbTintColor="#FF6500"
-        onValueChange={handleSlideDrag}
-      />
-
-      <Text style={tailwind("text-white")}>
-        {millisToMinutesAndSeconds(
-          status.durationMillis - status.positionMillis
-        )}
-      </Text>
-
-      <TouchableOpacity
-        onPress={async () => {
-          await ScreenOrientation.lockAsync(
-            orientation === "LANDSCAPE"
-              ? ScreenOrientation.OrientationLock.PORTRAIT
-              : ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
-          );
-        }}
-      >
-        <MaterialCommunityIcons name="fullscreen" size={24} color="white" />
-      </TouchableOpacity>
-    </View>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  sliderContainer: {
     ...tailwind("w-full bottom-0"),
     flexDirection: "row",
-    justifyContent: "space-evenly",
     alignItems: "center",
     position: "absolute",
   },
+  buttonContainer: {
+    ...tailwind("w-full bottom-10"),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    position: "absolute",
+  },
+  slider: { ...tailwind("w-full"), height: 40 },
 });

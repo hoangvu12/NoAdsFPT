@@ -47,6 +47,10 @@ export default function Item(props) {
   };
 
   const handleShowList = () => {
+    if (props.onShowListClick) {
+      return props.onShowListClick({ ...props });
+    }
+
     navigation.navigate("List", {
       ...props,
     });
@@ -86,7 +90,6 @@ export default function Item(props) {
             contentContainerStyle={{
               ...tailwind("flex items-center"),
             }}
-            bounces
             horizontal={props.horizontal}
             data={list}
             numColumns={!props.horizontal ? 2 : false}

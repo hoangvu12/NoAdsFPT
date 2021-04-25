@@ -1,11 +1,14 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { View, Text, ScrollView, StyleSheet, LogBox } from "react-native";
 import tailwind from "tailwind-rn";
-import { vw, vh } from "react-native-expo-viewport-units";
+import { vw } from "react-native-expo-viewport-units";
 import { useNavigation } from "@react-navigation/native";
-import { render } from "../../Components/Anime/render";
 
+import { render } from "../../Components/Anime/render";
+import BottomSheet from "../../Components/BottomSheet";
 import Item from "../../Components/Item";
+import { notifyMessage } from "../../utils";
+
 import { VideoContext } from "./Store";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
@@ -16,6 +19,9 @@ export default function Description(props) {
     info: [anime],
   } = useContext(VideoContext);
 
+  const [itemsShow, setItemsShow] = useState(24);
+  const bottomSheetRef = useRef(null);
+
   const navigation = useNavigation();
 
   const handleTitleColor = ({ anime }) => {
@@ -24,6 +30,19 @@ export default function Description(props) {
 
   const handleItemPress = (props) => {
     navigation.push("Watch", { id: props.id });
+  };
+
+  const handleNewList = (props) => {
+    if (itemsShow >= props.data.length) {
+      return notifyMessage("Hết dữ liệu");
+    }
+
+    notifyMessage("Đang tải dữ liệu");
+    setItemsShow(itemsShow + 12);
+  };
+
+  const handleShowListClick = (props) => {
+    bottomSheetRef.current.open();
   };
 
   const [descriptionObj] = useState(() => {
@@ -91,26 +110,39 @@ export default function Description(props) {
         </View>
         <View style={styles.column}>
           <ScrollView style={{ flex: 1 }}>
-            <View style={tailwind("flex justify-center mb-5")}>
-              <Text
-                style={tailwind("text-white text-base font-bold")}
-                numberOfLines={1}
-              >
-                Tập phim
-              </Text>
-            </View>
-
             <View style={{ flex: 1 }}>
               <Item.Container style={{ flex: 1 }}>
                 <Item
-                  data={anime.episodes.filter((episode) => !episode.is_trailer)}
+                  itemName="Tập phim"
+                  data={anime.episodes
+                    .filter((episode) => !episode.is_trailer)
+                    .slice(0, 24)}
                   horizontal={false}
                   episode={episode}
                   onItemPress={props.onEpisodePress}
                   onTitleColor={handleTitleColor}
+                  onShowListClick={handleShowListClick}
                   renderItem={render}
+                  showList
                 />
               </Item.Container>
+
+              <BottomSheet ref={bottomSheetRef}>
+                <View style={[{ flex: 1 }]}>
+                  <Item
+                    itemName="Tập phim"
+                    data={anime.episodes
+                      .filter((episode) => !episode.is_trailer)
+                      .slice(0, itemsShow)}
+                    horizontal={false}
+                    episode={episode}
+                    onItemPress={props.onEpisodePress}
+                    onTitleColor={handleTitleColor}
+                    onNewList={handleNewList}
+                    renderItem={render}
+                  />
+                </View>
+              </BottomSheet>
             </View>
           </ScrollView>
         </View>
@@ -118,21 +150,13 @@ export default function Description(props) {
         {anime.episodes.some((episode) => episode.is_trailer) && (
           <View style={styles.column}>
             <ScrollView>
-              <View style={tailwind("flex justify-center mb-5")}>
-                <Text
-                  style={tailwind("text-white text-base font-bold")}
-                  numberOfLines={1}
-                >
-                  Trailer
-                </Text>
-              </View>
-
               <View style={{ flex: 1 }}>
                 <Item.Container style={{ width: "100%" }}>
                   <Item
                     data={anime.episodes.filter(
                       (episode) => episode.is_trailer
                     )}
+                    itemName="Trailer"
                     horizontal={false}
                     episode={episode}
                     onItemPress={props.onEpisodePress}
@@ -147,18 +171,10 @@ export default function Description(props) {
 
         <View style={styles.column}>
           <ScrollView>
-            <View style={tailwind("flex justify-center mb-5")}>
-              <Text
-                style={tailwind("text-white text-base font-bold")}
-                numberOfLines={1}
-              >
-                Nội dung liên quan
-              </Text>
-            </View>
-
             <View style={{ flex: 1 }}>
               <Item.Container style={{ width: "100%" }}>
                 <Item
+                  itemName="Nội dung liên quan"
                   data={anime.related_videos}
                   horizontal={false}
                   onItemPress={handleItemPress}

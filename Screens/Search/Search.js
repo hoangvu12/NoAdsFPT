@@ -6,7 +6,6 @@ import Constants from "expo-constants";
 import { vw, vh } from "react-native-expo-viewport-units";
 
 import { getTrendingKeywords, search } from "../../models/Anime";
-import { isEmpty } from "../../utils/";
 import { useNavigation } from "@react-navigation/native";
 import { render } from "../../Components/Anime/render";
 import Item from "../../Components/Item";
@@ -42,21 +41,21 @@ export default function Search() {
 
   return (
     <View style={styles.container}>
-      <View style={tailwind("flex items-center")}>
+      <View style={{ ...tailwind("flex items-center"), flex: 0.5 }}>
         <Search.Input
           keyword={keyword}
           setKeyword={setKeyword}
           onChange={handleChange}
         />
       </View>
-      <View>
+      <View style={{ flex: 1 }}>
         <Search.Suggestion
           trendingKeywords={trendingKeywords}
           setTrendingKeywords={setTrendingKeywords}
           onPress={handleOnPress}
         />
       </View>
-      <View>
+      <View style={{ flex: 4.5 }}>
         <Search.List data={results} />
       </View>
     </View>
@@ -71,11 +70,12 @@ Search.List = ({ data }) => {
   };
 
   return (
-    <Item.Container>
+    <Item.Container style={{ flex: 1 }}>
       <Item
         data={data}
         onItemPress={handleItemPress}
         showList={false}
+        horizontal={false}
         renderItem={render}
       />
     </Item.Container>
