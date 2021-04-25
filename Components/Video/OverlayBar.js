@@ -1,5 +1,10 @@
 import React, { useContext } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 
 import tailwind from "tailwind-rn";
 import {
@@ -50,12 +55,16 @@ export default function OverlayBar(props) {
             : video.current.playAsync()
         }
       >
-        <MaterialIcons
-          name={status.isPlaying ? "pause" : "play-arrow"}
-          size={80}
-          color="white"
-          iconStyle={{ borderWidth: 10, borderColor: "black" }}
-        />
+        {status.isBuffering && <ActivityIndicator size={80} color="gray" />}
+
+        {!status.isBuffering && (
+          <MaterialIcons
+            name={status.isPlaying ? "pause" : "play-arrow"}
+            size={80}
+            color="white"
+            iconStyle={{ borderWidth: 10, borderColor: "black" }}
+          />
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity

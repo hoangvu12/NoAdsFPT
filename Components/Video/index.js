@@ -87,7 +87,7 @@ export default function Video(props) {
           )}
         >
           <ExpoVideo
-            shouldPlay={false}
+            shouldPlay
             ref={video}
             style={tailwind("h-full w-full")}
             usePoster

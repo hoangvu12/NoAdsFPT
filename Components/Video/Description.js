@@ -1,8 +1,16 @@
-import React, { useState, useContext, useRef } from "react";
-import { View, Text, ScrollView, StyleSheet, LogBox } from "react-native";
+import React, { useState, useContext, useRef, useMemo } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  LogBox,
+  Dimensions,
+} from "react-native";
 import tailwind from "tailwind-rn";
 import { vw } from "react-native-expo-viewport-units";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "expo-constants";
 
 import { render } from "../../Components/Anime/render";
 import BottomSheet from "../../Components/BottomSheet";
@@ -23,6 +31,7 @@ export default function Description(props) {
   const bottomSheetRef = useRef(null);
 
   const navigation = useNavigation();
+  const screenHeight = useMemo(() => Dimensions.get("screen").height, []);
 
   const handleTitleColor = ({ anime }) => {
     return anime._id === episode ? "#ff6500" : "#fff";
@@ -127,7 +136,10 @@ export default function Description(props) {
                 />
               </Item.Container>
 
-              <BottomSheet ref={bottomSheetRef}>
+              <BottomSheet
+                ref={bottomSheetRef}
+                height={screenHeight - (Constants.statusBarHeight + 50)}
+              >
                 <View style={[{ flex: 1 }]}>
                   <Item
                     itemName="Tập phim"

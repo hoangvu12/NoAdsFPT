@@ -11,7 +11,7 @@ export const BS = React.forwardRef((props, ref) => {
     <RBSheet
       ref={ref}
       animationType="fade"
-      height={screenHeight - 10}
+      height={screenHeight}
       closeOnDragDown={true}
       dragFromTopOnly={true}
       closeOnPressMask={false}
