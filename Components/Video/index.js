@@ -99,31 +99,14 @@ export default function Video(props) {
           />
 
           {!isEmpty(status) && showControls && !isLocked && (
-            <View
-              style={{
-                position: "absolute",
-                backgroundColor: "rgba(0,0,0,0.51)",
-                width: "100%",
-                height: "100%",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
+            <View style={styles.unlockedOverlay}>
               <Video.OverlayBar status={status} video={video} />
               <Video.ControlBar status={status} video={video} />
             </View>
           )}
 
           {isLocked && (
-            <View
-              style={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                justifyContent: "center",
-                alignItems: "flex-start",
-              }}
-            >
+            <View style={styles.lockedOverlay}>
               <TouchableOpacity onPress={(_) => setIsLocked(!isLocked)}>
                 <Entypo
                   name={isLocked ? "lock-open" : "lock"}
@@ -147,5 +130,20 @@ Video.Description = Description;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#18191A",
+    overlay: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+    },
+    lockedOverlay: {
+      ...styles.overlay,
+      alignItems: "flex-start",
+    },
+    unlockedOverlay: {
+      ...styles.overlay,
+      backgroundColor: "rgba(0,0,0,0.51)",
+      alignItems: "center",
+    },
   },
 });

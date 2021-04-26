@@ -54,7 +54,7 @@ export default function Description(props) {
     bottomSheetRef.current.open();
   };
 
-  const [descriptionObj] = useState(() => {
+  const descriptionObj = useMemo(() => {
     return [
       {
         key: "Số tập",
@@ -77,11 +77,11 @@ export default function Description(props) {
         value: anime.movie_release_date,
       },
     ];
-  });
+  }, []);
 
   return (
-    <View style={{ ...tailwind("py-2 items-center"), width: vw(100), flex: 1 }}>
-      <ScrollView horizontal style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView horizontal style={styles.scrollContainer}>
         <View style={styles.column}>
           <ScrollView>
             <View style={tailwind("flex items-center justify-center mb-5")}>
@@ -202,7 +202,8 @@ export default function Description(props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { ...tailwind("py-2 items-center"), width: vw(100), flex: 1 },
+  scrollContainer: {
     width: "95%",
   },
   column: {
