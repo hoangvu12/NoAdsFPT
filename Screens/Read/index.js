@@ -16,22 +16,6 @@ import Item from "./Item";
 import { getImages, getImageUrl } from "../../models/Manga";
 import { isEmpty, notifyMessage } from "../../utils";
 
-const showAlert = ({ chapters, chapterIndex, setChapterId }) =>
-  Alert.alert("Thông báo", "Sang chapter tiếp theo?", [
-    {
-      text: "Ở lại",
-      style: "cancel",
-    },
-    {
-      text: "Đồng ý",
-      onPress: () => {
-        const chapter = chapters[chapterIndex - 1];
-
-        setChapterId(chapter.id);
-      },
-    },
-  ]);
-
 export default function Read({ route }) {
   const { mangaSlug, mangaId, chapterSlug, chapters } = route.params;
 
@@ -143,9 +127,6 @@ export default function Read({ route }) {
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          onEndReached={() =>
-            showAlert({ setChapterId, chapters, chapterIndex })
-          }
           onEndReachedThreshold={0.1}
         />
       )}

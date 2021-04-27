@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { Dimensions } from "react-native";
 import RBSheet from "react-native-raw-bottom-sheet";
 
 import styles from "../../styles";
