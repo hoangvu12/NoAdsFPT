@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  Switch,
+} from "react-native";
 import tailwind from "tailwind-rn";
 import Constants from "expo-constants";
 
-import { vw, vh } from "react-native-expo-viewport-units";
+import { vw } from "react-native-expo-viewport-units";
 
-import { getTrendingKeywords, search } from "../../models/Anime";
+import { getTrendingKeywords, search as animeSearch } from "../../models/Anime";
+import { search as mangaSearch } from "../../models/Manga";
+
 import { useNavigation } from "@react-navigation/native";
-import { render } from "../../Components/Anime/render";
+
+import { render as animeRender } from "../../Components/Anime/render";
+import { render as mangaRender } from "../../Components/Manga/render";
 import Item from "../../Components/Item";
 
 export default function Search() {
@@ -15,13 +26,28 @@ export default function Search() {
   const [keyword, setKeyword] = useState("");
   const [results, setResults] = useState([]);
 
+  const [isMangaMode, setIsMangaMode] = useState(false);
+  const toggleSwitch = () => {
+    setIsMangaMode((previousState) => !previousState);
+    setResults([]);
+    setKeyword("");
+  };
+
   useEffect(() => {
     setResults([]);
 
     const getData = async () => {
       if (!keyword) return;
 
-      const searchResults = await search({ keyword });
+      if (!isMangaMode) {
+        const searchResults = await animeSearch({ keyword });
+
+        setResults(searchResults);
+
+        return;
+      }
+
+      const searchResults = await mangaSearch({ keyword });
 
       setResults(searchResults);
     };
@@ -41,42 +67,64 @@ export default function Search() {
 
   return (
     <View style={styles.container}>
-      <View style={{ ...tailwind("flex items-center"), flex: 0.5 }}>
+      <View style={{ ...tailwind("flex items-center") }}>
         <Search.Input
           keyword={keyword}
           setKeyword={setKeyword}
           onChange={handleChange}
         />
       </View>
-      <View style={{ flex: 1 }}>
-        <Search.Suggestion
-          trendingKeywords={trendingKeywords}
-          setTrendingKeywords={setTrendingKeywords}
-          onPress={handleOnPress}
+      <View
+        style={{ ...tailwind("flex flex-row justify-end items-center mr-2") }}
+      >
+        <Text style={tailwind("text-white text-sm mr-2")}>Anime</Text>
+        <Switch
+          trackColor={{ false: "#767577", true: "#f78b44" }}
+          thumbColor={isMangaMode ? "#FF6400" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleSwitch}
+          value={isMangaMode}
         />
+        <Text style={tailwind("text-white text-sm ml-2")}>Manga</Text>
       </View>
-      <View style={{ flex: 4.5 }}>
-        <Search.List data={results} />
+      {!isMangaMode && (
+        <View>
+          <Search.Suggestion
+            trendingKeywords={trendingKeywords}
+            setTrendingKeywords={setTrendingKeywords}
+            onPress={handleOnPress}
+          />
+        </View>
+      )}
+      <View style={{ flex: 1 }}>
+        <Search.List data={results} isMangaMode={isMangaMode} />
       </View>
     </View>
   );
 }
 
-Search.List = ({ data }) => {
+Search.List = ({ data, isMangaMode }) => {
   const navigation = useNavigation();
 
-  const handleItemPress = (props) => {
+  const handleAnimeItemPress = (props) => {
     navigation.push("Watch", { id: props.id });
+  };
+
+  const handleMangaItemPress = ({ id: data }) => {
+    navigation.push("Manga", {
+      id: data.id,
+      slug: data.slug.name || data.slug,
+    });
   };
 
   return (
     <Item.Container style={{ flex: 1 }}>
       <Item
         data={data}
-        onItemPress={handleItemPress}
+        onItemPress={isMangaMode ? handleMangaItemPress : handleAnimeItemPress}
         showList={false}
         horizontal={false}
-        renderItem={render}
+        renderItem={isMangaMode ? mangaRender : animeRender}
       />
     </Item.Container>
   );

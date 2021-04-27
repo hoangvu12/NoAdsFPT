@@ -35,7 +35,7 @@ export function render(props) {
         >
           {manga.recentChapters
             ? manga.recentChapters[0].name
-            : manga.latestChapter}
+            : manga.latestChapter || manga.description}
         </Text>
       </TouchableOpacity>
     </View>

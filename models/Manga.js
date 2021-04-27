@@ -2,6 +2,14 @@ import axios from "axios";
 
 const BASE_URL = "https://nguyenvu-stuff.glitch.me/nettruyen";
 
+export async function search({ keyword }) {
+  const URL = `${BASE_URL}/search?keyword=${keyword}`;
+
+  const { data } = await axios.get(URL);
+
+  return data.data;
+}
+
 export async function getList({
   type = "recommended",
   page = 1,

@@ -3,12 +3,12 @@ import { TouchableOpacity } from "react-native";
 import { HeaderBackButton } from "@react-navigation/stack";
 import { AntDesign } from "@expo/vector-icons";
 
-import Dashboard from "./Dashboard/Dashboard";
-import ShowList from "./ShowList/ShowList";
-import Search from "./Search/Search";
-import Manga from "./Manga";
+import Dashboard from "./Dashboard/";
+import ShowList from "./ShowList/";
+import Search from "./Search/";
+import Manga from "./Manga/";
 import Watch from "./Watch/";
-import Read from "./Read";
+import Read from "./Read/";
 
 const screenOptions = ({ route, navigation }) => ({
   headerStyle: {
@@ -27,7 +27,7 @@ const screenOptions = ({ route, navigation }) => ({
 
 export const options = {
   screenOptions: screenOptions,
-  initialRouteName: "Dashboard",
+  initialRouteName: "Search",
 };
 
 export default [
