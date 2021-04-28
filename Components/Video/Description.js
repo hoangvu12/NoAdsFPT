@@ -81,9 +81,17 @@ export default function Description(props) {
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal style={styles.scrollContainer}>
+      <ScrollView
+        horizontal
+        style={styles.scrollContainer}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.column}>
-          <ScrollView>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={tailwind("flex items-center justify-center mb-5")}>
               <Text
                 style={tailwind("text-white text-base font-bold")}
@@ -118,7 +126,11 @@ export default function Description(props) {
           </ScrollView>
         </View>
         <View style={styles.column}>
-          <ScrollView style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={{ flex: 1 }}>
               <Item.Container style={{ flex: 1 }}>
                 <Item
@@ -161,14 +173,17 @@ export default function Description(props) {
 
         {anime.episodes.some((episode) => episode.is_trailer) && (
           <View style={styles.column}>
-            <ScrollView>
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
               <View style={{ flex: 1 }}>
                 <Item.Container style={{ width: "100%" }}>
                   <Item
                     data={anime.episodes.filter(
                       (episode) => episode.is_trailer
                     )}
-                    itemName="Trailer"
+                    itemName="Trailer / Hậu trường"
                     horizontal={false}
                     episode={episode}
                     onItemPress={props.onEpisodePress}
@@ -182,7 +197,10 @@ export default function Description(props) {
         )}
 
         <View style={styles.column}>
-          <ScrollView>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={{ flex: 1 }}>
               <Item.Container style={{ width: "100%" }}>
                 <Item

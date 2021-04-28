@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList } from "react-native";
 import { vw } from "react-native-expo-viewport-units";
 import { useNavigation } from "@react-navigation/native";
-import { OptimizedFlatList } from "react-native-optimized-flatlist";
 
 import tailwind from "tailwind-rn";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -94,7 +93,7 @@ export default function Item(props) {
             data={list}
             numColumns={!props.horizontal ? 2 : false}
             renderItem={handleRenderItem}
-            keyExtractor={(item) => item._id || item.id}
+            keyExtractor={(item, index) => item._id || item.id || index}
             onEndReached={handleEndReached}
             onEndReachedThreshold={0.1}
             showsVerticalScrollIndicator={false}

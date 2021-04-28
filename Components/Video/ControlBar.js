@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useCallback } from "react";
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 
 import tailwind from "tailwind-rn";
@@ -19,10 +19,10 @@ export default function ControlBar(props) {
 
   const orientation = useOrientation();
 
-  const handleSlideDrag = async (value) => {
+  const handleSlideDrag = useCallback(async (value) => {
     await video.current.setPositionAsync(value);
     video.current.playAsync();
-  };
+  }, []);
 
   return (
     <>
@@ -75,9 +75,9 @@ export default function ControlBar(props) {
           minimumValue={0}
           maximumValue={status.durationMillis}
           value={status.positionMillis}
-          minimumTrackTintColor="#FF6500"
+          minimumTrackTintColor="#FF6400"
           maximumTrackTintColor="#fff"
-          thumbTintColor="#FF6500"
+          thumbTintColor="#fff"
           onValueChange={handleSlideDrag}
         />
       </View>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   buttonContainer: {
-    ...tailwind("w-full bottom-10"),
+    ...tailwind("w-11/12 bottom-10"),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

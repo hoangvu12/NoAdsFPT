@@ -1,4 +1,10 @@
-import React, { useRef, useState, useEffect, useContext } from "react";
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import {
   View,
   StyleSheet,
@@ -18,6 +24,7 @@ import { isEmpty } from "../../utils";
 import useOrientation from "../../hooks/useOrientation";
 
 import ControlBar from "./ControlBar";
+import TopOverlay from "./TopOverlay";
 import OverlayBar from "./OverlayBar";
 import Description from "./Description";
 
@@ -31,7 +38,7 @@ export default function Video(props) {
   const [status, setStatus] = useState({});
 
   const [showControls, setShowControls] = useState(true);
-  const [timeoutLeave, setTimeoutLeave] = useState(false);
+  const timeoutLeave = useRef(null);
 
   const navigation = useNavigation();
   const orientation = useOrientation();
@@ -58,21 +65,19 @@ export default function Video(props) {
     return () => clearInterval(interval);
   }, [episode]);
 
-  const handleScreenTouch = () => {
+  const handleScreenTouch = useCallback(() => {
     setShowControls(!showControls);
 
     // If there is timeout, clear it
-    if (timeoutLeave) {
-      clearTimeout(timeoutLeave);
+    if (timeoutLeave.current) {
+      clearTimeout(timeoutLeave.current);
     }
 
     // If user don't click the screen ever again, then hide controls
-    setTimeoutLeave(
-      setTimeout(() => {
-        setShowControls(false);
-      }, 3000)
-    );
-  };
+    timeoutLeave.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  });
 
   return (
     <View style={styles.container}>
@@ -87,7 +92,7 @@ export default function Video(props) {
           )}
         >
           <ExpoVideo
-            shouldPlay
+            shouldPlay={false}
             ref={video}
             style={tailwind("h-full w-full")}
             usePoster
@@ -95,11 +100,13 @@ export default function Video(props) {
               uri: props.source,
               overrideFileExtensionAndroid: "m3u8",
             }}
-            resizeMode={ExpoVideo.RESIZE_MODE_CONTAIN}
+            resizeMode={ExpoVideo.RESIZE_MODE_COVER}
+            onPlaybackStatusUpdate={(status) => setStatus(() => status)}
           />
 
           {!isEmpty(status) && showControls && !isLocked && (
             <View style={[styles.overlay, styles.unlockedOverlay]}>
+              {orientation === "LANDSCAPE" && <Video.TopOverlay />}
               <Video.OverlayBar status={status} video={video} />
               <Video.ControlBar status={status} video={video} />
             </View>
@@ -123,6 +130,7 @@ export default function Video(props) {
   );
 }
 
+Video.TopOverlay = TopOverlay;
 Video.OverlayBar = OverlayBar;
 Video.ControlBar = ControlBar;
 Video.Description = Description;
