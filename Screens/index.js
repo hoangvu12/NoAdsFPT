@@ -39,16 +39,6 @@ export default [
   {
     name: "Watch",
     component: Watch,
-    options: ({ navigation }) => ({
-      title: "Xem video",
-      headerLeft: (props) => (
-        <HeaderBackButton
-          {...props}
-          onPress={() => {
-            navigation.navigate("Dashboard");
-          }}
-        />
-      ),
-    }),
+    options: { headerShown: false },
   },
 ];

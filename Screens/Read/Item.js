@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { useRef, memo } from "react";
 import { Dimensions } from "react-native";
 
 import Image from "react-native-scalable-image";

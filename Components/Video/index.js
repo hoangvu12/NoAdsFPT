@@ -15,7 +15,6 @@ import {
 import { Entypo } from "@expo/vector-icons";
 import { Video as ExpoVideo } from "expo-av";
 import tailwind from "tailwind-rn";
-import { useNavigation } from "@react-navigation/native";
 import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 
 import { VideoContext } from "./Store";
@@ -40,17 +39,15 @@ export default function Video(props) {
   const [showControls, setShowControls] = useState(true);
   const timeoutLeave = useRef(null);
 
-  const navigation = useNavigation();
   const orientation = useOrientation();
 
   useEffect(() => {
     if (orientation === "LANDSCAPE") {
       activateKeepAwake();
-      return navigation.setOptions({ headerShown: false });
+      return;
     }
 
     deactivateKeepAwake();
-    navigation.setOptions({ headerShown: true });
   }, [orientation]);
 
   useEffect(() => {
@@ -104,9 +101,9 @@ export default function Video(props) {
             onPlaybackStatusUpdate={(status) => setStatus(() => status)}
           />
 
-          {!isEmpty(status) && showControls && !isLocked && (
+          {!isEmpty(status) && !isLocked && (
             <View style={[styles.overlay, styles.unlockedOverlay]}>
-              {orientation === "LANDSCAPE" && <Video.TopOverlay />}
+              <Video.TopOverlay />
               <Video.OverlayBar status={status} video={video} />
               <Video.ControlBar status={status} video={video} />
             </View>

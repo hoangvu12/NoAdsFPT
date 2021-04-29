@@ -66,7 +66,7 @@ export default function OverlayBar(props) {
 
         <TouchableOpacity onPress={onPlayPress}>
           {status.isBuffering && (
-            <ActivityIndicator size={80} color="#FF6400" />
+            <ActivityIndicator size={80} color="rgba(250,250,250,0.8)" />
           )}
 
           {!status.isBuffering && (
