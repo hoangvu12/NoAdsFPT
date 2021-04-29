@@ -101,7 +101,7 @@ export default function Video(props) {
             onPlaybackStatusUpdate={(status) => setStatus(() => status)}
           />
 
-          {!isEmpty(status) && !isLocked && (
+          {!isEmpty(status) && showControls && !isLocked && (
             <View style={[styles.overlay, styles.unlockedOverlay]}>
               <Video.TopOverlay />
               <Video.OverlayBar status={status} video={video} />
