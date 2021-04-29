@@ -1,15 +1,8 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
-  Switch,
-} from "react-native";
+import React, { useState, useEffect, useMemo } from "react";
+import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
 import tailwind from "tailwind-rn";
 import Constants from "expo-constants";
-
+import SwitchSelector from "react-native-switch-selector";
 import { vw } from "react-native-expo-viewport-units";
 
 import { getTrendingKeywords, search as animeSearch } from "../../models/Anime";
@@ -27,10 +20,25 @@ export default function Search() {
   const [results, setResults] = useState([]);
 
   const [isMangaMode, setIsMangaMode] = useState(false);
-  const toggleSwitch = () => {
-    setIsMangaMode((previousState) => !previousState);
-    setResults([]);
+
+  const switchOptions = useMemo(
+    () => [
+      {
+        label: "Anime",
+        value: "0",
+      },
+      {
+        label: "Manga",
+        value: "1",
+      },
+    ],
+    []
+  );
+
+  const onSwitchPress = (value) => {
+    setIsMangaMode(!!+value);
     setKeyword("");
+    setResults([]);
   };
 
   useEffect(() => {
@@ -75,17 +83,20 @@ export default function Search() {
         />
       </View>
       <View
-        style={{ ...tailwind("flex flex-row justify-end items-center mr-2") }}
+        style={{
+          ...tailwind("flex flex-row justify-center items-center my-2 mr-2"),
+        }}
       >
-        <Text style={tailwind("text-white text-sm mr-2")}>Anime</Text>
-        <Switch
-          trackColor={{ false: "#767577", true: "#f78b44" }}
-          thumbColor={isMangaMode ? "#FF6400" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isMangaMode}
+        <SwitchSelector
+          options={switchOptions}
+          style={tailwind("w-5/6")}
+          initial={0}
+          onPress={onSwitchPress}
+          backgroundColor="#242526"
+          textColor="#fff"
+          buttonColor="#FF6400"
+          animationDuration={300}
         />
-        <Text style={tailwind("text-white text-sm ml-2")}>Manga</Text>
       </View>
       {!isMangaMode && (
         <View>

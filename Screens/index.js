@@ -27,7 +27,7 @@ const screenOptions = ({ route, navigation }) => ({
 
 export const options = {
   screenOptions: screenOptions,
-  initialRouteName: "Dashboard",
+  initialRouteName: "Search",
 };
 
 export default [
