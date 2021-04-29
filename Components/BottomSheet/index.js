@@ -1,34 +1,10 @@
-import React, { useMemo } from "react";
-import { Dimensions } from "react-native";
-import RBSheet from "react-native-raw-bottom-sheet";
+import React from "react";
+import RBSheet from "reanimated-bottom-sheet";
 
 import styles from "../../styles";
 
 export const BS = React.forwardRef((props, ref) => {
-  const screenHeight = useMemo(() => Dimensions.get("screen").height, []);
-
-  return (
-    <RBSheet
-      ref={ref}
-      animationType="fade"
-      height={screenHeight}
-      closeOnDragDown={true}
-      dragFromTopOnly={true}
-      closeOnPressMask={false}
-      customStyles={{
-        container: {
-          ...styles.backgroundColor,
-          borderRadius: 20,
-        },
-        draggableIcon: {
-          backgroundColor: "gray",
-        },
-      }}
-      {...props}
-    >
-      {props.children}
-    </RBSheet>
-  );
+  return <RBSheet ref={ref} {...props} />;
 });
 
 export default BS;

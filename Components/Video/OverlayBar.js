@@ -95,7 +95,7 @@ export default function OverlayBar(props) {
           <Entypo
             name="controller-fast-forward"
             size={30}
-            color={episode >= maxEpisode - 1 ? "gray" : "white"}
+            color={episode >= maxEpisode ? "gray" : "white"}
           />
         </TouchableOpacity>
       </View>

@@ -1,21 +1,29 @@
-import React, { useState, useContext, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useContext,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
+  Image,
   LogBox,
-  Dimensions,
 } from "react-native";
 import tailwind from "tailwind-rn";
 import { vw } from "react-native-expo-viewport-units";
 import { useNavigation } from "@react-navigation/native";
-import Constants from "expo-constants";
+import ScrollBottomSheet from "react-native-scroll-bottom-sheet";
 
 import { render } from "../../Components/Anime/render";
-import BottomSheet from "../../Components/BottomSheet";
+
 import Item from "../../Components/Item";
 import { notifyMessage } from "../../utils";
+import globalStyles from "../../styles";
 
 import { VideoContext } from "./Store";
 
@@ -27,11 +35,52 @@ export default function Description(props) {
     info: [anime],
   } = useContext(VideoContext);
 
+  const customRender = useCallback(
+    ({ item: anime }) => (
+      <View style={tailwind("w-40 mb-5 mx-2")}>
+        <TouchableOpacity
+          onPress={(_) =>
+            props.onEpisodePress({ id: anime.referred_object_id || anime._id })
+          }
+        >
+          <Image
+            source={{
+              uri: `${
+                anime.wide_image || anime.thumb
+              }?w=282&mode=scale&fmt=webp`,
+            }}
+            style={{
+              ...tailwind("w-full h-24 rounded-md mb-2"),
+              resizeMode: "cover",
+            }}
+          />
+
+          <Text
+            style={{
+              ...tailwind("w-11/12 text-sm"),
+              color: anime._id === episode ? "#ff6500" : "#fff",
+            }}
+            numberOfLines={1}
+          >
+            {anime.title_vie || anime.title}
+          </Text>
+
+          <Text
+            style={tailwind("w-11/12 text-gray-400 text-xs")}
+            numberOfLines={1}
+          >
+            {anime.title_origin || ""}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    ),
+    [episode]
+  );
+
   const [itemsShow, setItemsShow] = useState(24);
   const bottomSheetRef = useRef(null);
 
   const navigation = useNavigation();
-  const screenHeight = useMemo(() => Dimensions.get("screen").height, []);
 
   const handleTitleColor = ({ anime }) => {
     return anime._id === episode ? "#ff6500" : "#fff";
@@ -51,7 +100,7 @@ export default function Description(props) {
   };
 
   const handleShowListClick = (props) => {
-    bottomSheetRef.current.open();
+    bottomSheetRef.current.snapTo(0);
   };
 
   const descriptionObj = useMemo(() => {
@@ -147,26 +196,6 @@ export default function Description(props) {
                   showList
                 />
               </Item.Container>
-
-              <BottomSheet
-                ref={bottomSheetRef}
-                height={screenHeight - (Constants.statusBarHeight + 50)}
-              >
-                <View style={[{ flex: 1 }]}>
-                  <Item
-                    itemName="Tập phim"
-                    data={anime.episodes
-                      .filter((episode) => !episode.is_trailer)
-                      .slice(0, itemsShow)}
-                    horizontal={false}
-                    episode={episode}
-                    onItemPress={props.onEpisodePress}
-                    onTitleColor={handleTitleColor}
-                    onNewList={handleNewList}
-                    renderItem={render}
-                  />
-                </View>
-              </BottomSheet>
             </View>
           </ScrollView>
         </View>
@@ -215,6 +244,29 @@ export default function Description(props) {
           </ScrollView>
         </View>
       </ScrollView>
+      <ScrollBottomSheet // If you are using TS, that'll infer the renderItem `item` type
+        componentType="FlatList"
+        ref={bottomSheetRef}
+        snapPoints={["0%", "100%"]}
+        initialSnapIndex={1}
+        renderHandle={() => (
+          <View style={styles.header}>
+            <View style={styles.panelHandle} />
+          </View>
+        )}
+        numColumns={2}
+        data={anime.episodes
+          .filter((episode) => !episode.is_trailer)
+          .slice(0, itemsShow)}
+        keyExtractor={(item, index) => item._id || item.id || index}
+        renderItem={customRender}
+        contentContainerStyle={styles.contentContainerStyle}
+        key="h"
+        onEndReached={handleNewList}
+        onEndReachedThreshold={0.1}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -227,5 +279,22 @@ const styles = StyleSheet.create({
   column: {
     width: vw(90),
     marginRight: 12,
+  },
+  header: {
+    ...globalStyles.backgroundColor,
+    alignItems: "center",
+    paddingVertical: 20,
+    borderTopLeftRadius: 40,
+    borderTopRightRadius: 40,
+  },
+  panelHandle: {
+    width: 40,
+    height: 2,
+    backgroundColor: "rgba(250,250,250,0.7)",
+    borderRadius: 4,
+  },
+  contentContainerStyle: {
+    ...tailwind("flex items-center"),
+    ...globalStyles.backgroundColor,
   },
 });

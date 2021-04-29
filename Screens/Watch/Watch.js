@@ -22,16 +22,14 @@ export default function Watch({ route, navigation }) {
 
   const orientation = useOrientation();
 
-  const handleEpisodePress = ({ id: episode }) => {
-    setEpisode(episode);
-  };
+  const handleEpisodePress = ({ id: episode }) => setEpisode(episode);
 
   useEffect(() => {
     const getData = async () => {
       const info = await getAnimeInfo({ id });
 
       setInfo(info);
-      setMaxEpisode(info.episode_latest);
+      setMaxEpisode(info.episodes[info.episodes.length - 1]._id);
     };
 
     getData();
